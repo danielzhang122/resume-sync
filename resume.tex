@@ -1,4 +1,6 @@
 \documentclass[a4paper]{article}
+% Reproducible PDF: leave out the build date and random ID, so identical source gives an identical file
+\ifdefined\pdftrailerid \pdfinfoomitdate=1 \pdftrailerid{} \fi
 \usepackage{fullpage}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -188,7 +190,7 @@
 \begin{itemize}
     \item Built an end-to-end pipeline (Python $\rightarrow$ DuckDB $\rightarrow$ SQL $\rightarrow$ Streamlit) on 11.8M rows of IESO hourly generation, intertie, and price data for 193 generators (2019--2026).
     \item Wrote 16 SQL queries using window functions to detect 206 multi-day outages across Ontario's 18 reactors, label 1.16M reactor-hours by operating state, and measure how gas, hydro, and imports filled each gap.
-    \item Quantified outage impacts on price and emissions; Darlington Unit 4's refurbishment added an estimated $\sim$64,000\,t of CO\textsubscript{2} in its first two weeks as gas covered the lost output.
+    \item Estimated outage impacts on price and emissions; Darlington Unit 4's refurbishment was associated with $\sim$64,000\,t of extra CO\textsubscript{2} in its first two weeks as gas covered the lost output.
 \end{itemize}
 \vspace{1.5mm}
 
@@ -198,7 +200,7 @@
 \vspace{1mm}
 \begin{itemize}
     \item Designed a 12-DOF quadruped in Autodesk Fusion with a print-ready chassis, integrating MG90S servos, a PCA9685 driver, and a Raspberry Pi Zero 2 W.
-    \item Developed a custom Inverse Kinematics (IK) solver for stable omnidirectional gait patterns, tested in MuJoCo, with OpenCV camera integration for autonomous obstacle avoidance.
+    \item Wrote a joint-space trot gait controller in Python that stands, walks, and turns in place in MuJoCo, with unit and headless-sim tests and a hardware mode for the PCA9685 ready for first assembly.
 \end{itemize}
 \vspace{1.5mm}
 
