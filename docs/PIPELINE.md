@@ -58,9 +58,10 @@ flowchart TD
   of the PDF, so rebuilding unchanged source produces a byte-identical file and no new commit.
 - **No force-pushes, ever.** Each new PR gets a fresh dated branch, and updates to an open PR are
   plain fast-forward pushes. A merged PR's branch is never reused.
-- **Commits under my identity.** The agent sets my git identity before committing, so tooling
-  doesn't add itself as a contributor. PR descriptions are read back and stripped of tool-added
-  attribution footers.
+- **Claude gets credit; the wording is mine.** The agent commits to this repo as Claude, so it shows
+  up as a contributor here rather than hiding behind my name. What it drafts is a starting point:
+  I reword every bullet in a way that suits me before it stays on the résumé, so it doesn't read
+  like AI slop. The agent is told not to revert my wording, only to fix facts that drift.
 - **Weekly, early exit.** A daily schedule would mostly confirm nothing changed. Weekly with a
   script-only first step costs close to nothing on quiet weeks.
 
@@ -87,7 +88,8 @@ All tests ran on 2026-10-31/11-01 against the real repos.
 | End-to-end | Planted the old false quadruped claim on a test branch, rewound the state, ran the agent | In 186 s it detected the quadruped README change, replaced the claim with what the repo supports (including the README's measured 0.11 m/s walking speed), removed hardware part numbers nothing in the repo backs up, opened a PR citing commit `3c259d2`, and the build passed at one page. Closed unmerged |
 | No loop | Ran the real weekly job right after | Found only the stale website PDF, opened one website PR, made no résumé or state commits (58 s) |
 
-Bugs the tests caught, all fixed: commits authored as the AI instead of me; reuse of a merged PR's
+Bugs the tests caught, all fixed: commits authored as the AI instead of me (since 2026-11-01
+that's deliberate in this repo, see Design decisions); reuse of a merged PR's
 branch (would have needed a force-push, which was blocked); an attribution footer added by the PR
 tool; and the non-reproducible PDF above.
 
