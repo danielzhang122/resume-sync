@@ -37,8 +37,9 @@ flowchart TD
 | State | Last-reviewed commit per repo, excluded paths, ignored repos | [`sync-state.json`](../sync-state.json) |
 | Content rules and procedure | What may be claimed and how, step by step | [`SYNC.md`](../SYNC.md) |
 | Build and validation | GitHub Action: reproducible LaTeX build, one-page check, PDF + WebP preview | [`.github/workflows/build.yml`](../.github/workflows/build.yml) |
-| Tests | 8 unit tests on throwaway git repos, run in CI | [`tests/test_check.py`](../tests/test_check.py), [`test.yml`](../.github/workflows/test.yml) |
+| Tests | 9 unit tests on throwaway git repos, run in CI | [`tests/test_check.py`](../tests/test_check.py), [`test.yml`](../.github/workflows/test.yml) |
 | Orchestration | Scheduled Claude Code routine (cloud agent) that runs the procedure | configured on claude.ai |
+| Installer | Copies the pipeline into someone else's résumé repo and fills in a generic `SYNC.md` | [`scripts/install.py`](../scripts/install.py), [`INSTALL.md`](../INSTALL.md) |
 
 ## Design decisions
 

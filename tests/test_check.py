@@ -102,6 +102,19 @@ class CheckTest(unittest.TestCase):
         out = check.check(self.root / "resume", self.root, lambda: None)
         self.assertEqual(out, ["repo-list unavailable", "NOTHING TO SYNC"])
 
+    def test_config_block_for_another_user(self):
+        # An installed copy names its own repo, PDF and (optional) website in sync-state.json.
+        state = json.loads((self.root / "resume" / "sync-state.json").read_text())
+        state["config"] = {"github_user": "someone", "resume_repo": "resume",
+                           "pdf_name": "Jane_Doe_Resume.pdf", "website_repo": ""}
+        (self.root / "resume" / "sync-state.json").write_text(json.dumps(state))
+        commit(self.root / "resume", {"Jane_Doe_Resume.pdf": b"pdf-v1"})
+        state["repos"]["resume"] = git(self.root / "resume", "rev-parse", "HEAD")
+        state["exclude_paths"]["resume"].append("Jane_Doe_Resume.pdf")
+        (self.root / "resume" / "sync-state.json").write_text(json.dumps(state))
+        # No website repo configured: a differing PDF elsewhere is not "stale".
+        self.assertEqual(self.run_check(), ["NOTHING TO SYNC"])
+
 
 if __name__ == "__main__":
     unittest.main()

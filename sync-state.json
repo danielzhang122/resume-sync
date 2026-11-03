@@ -1,5 +1,11 @@
 {
   "last_run": "2026-11-02",
+  "config": {
+    "github_user": "danielzhang122",
+    "resume_repo": "resume",
+    "pdf_name": "Daniel_Zhang_Resume.pdf",
+    "website_repo": "website"
+  },
   "repos": {
     "resume": "aa0971cbad65303c8ff72f386ad5288d9c9c520d",
     "website": "9d93e058dc39c4186cb3c4985cefeab76eed7b23",

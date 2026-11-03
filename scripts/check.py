@@ -23,7 +23,14 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent  # the resume repo
 ROOT = HERE.parent                              # folder holding all clones
-USER = "danielzhang122"
+
+# Defaults for the optional "config" block in sync-state.json (set by scripts/install.py).
+DEFAULTS = {
+    "github_user": "danielzhang122",
+    "resume_repo": "resume",
+    "pdf_name": "Daniel_Zhang_Resume.pdf",
+    "website_repo": "website",  # "" if there is no website repo
+}
 
 
 def git(repo: Path, *args: str) -> str:
@@ -39,8 +46,8 @@ def changed_files(repo: Path, since: str, excludes: list[str]) -> list[str] | No
     return [f for f in files if not any(fnmatch.fnmatch(f, p) for p in excludes)]
 
 
-def public_repos() -> list[dict] | None:
-    url = f"https://api.github.com/users/{USER}/repos?per_page=100"
+def public_repos(user: str = DEFAULTS["github_user"]) -> list[dict] | None:
+    url = f"https://api.github.com/users/{user}/repos?per_page=100"
     try:
         with urllib.request.urlopen(url, timeout=15) as r:
             return json.load(r)
@@ -48,14 +55,17 @@ def public_repos() -> list[dict] | None:
         return None
 
 
-def check(here: Path = HERE, root: Path = ROOT, list_repos=public_repos) -> list[str]:
+def check(here: Path = HERE, root: Path = ROOT, list_repos=None) -> list[str]:
     """Return the output lines. `here` is the resume repo, `root` the folder with the other clones."""
     state = json.loads((here / "sync-state.json").read_text(encoding="utf-8"))
+    cfg = {**DEFAULTS, **state.get("config", {})}
+    if list_repos is None:
+        list_repos = lambda: public_repos(cfg["github_user"])  # noqa: E731
     excludes = state.get("exclude_paths", {})
     findings, notes = [], []
 
     for name, since in state["repos"].items():
-        repo = here if name == "resume" else root / name
+        repo = here if name == cfg["resume_repo"] else root / name
         if not repo.exists():
             findings.append(f"changed {name} (not cloned)")
             continue
@@ -73,9 +83,9 @@ def check(here: Path = HERE, root: Path = ROOT, list_repos=public_repos) -> list
         findings += [f"new {r['name']}" for r in repos
                      if not r["fork"] and not r["archived"] and r["name"] not in known]
 
-    site_pdf = root / "website" / "Daniel_Zhang_Resume.pdf"
-    own_pdf = here / "Daniel_Zhang_Resume.pdf"
-    if site_pdf.exists() and own_pdf.exists() and site_pdf.read_bytes() != own_pdf.read_bytes():
+    site_pdf = root / cfg["website_repo"] / cfg["pdf_name"]
+    own_pdf = here / cfg["pdf_name"]
+    if cfg["website_repo"] and site_pdf.exists() and own_pdf.exists() and site_pdf.read_bytes() != own_pdf.read_bytes():
         findings.append("website-pdf stale")
 
     return notes + findings + ([] if findings else ["NOTHING TO SYNC"])
