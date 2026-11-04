@@ -27,7 +27,7 @@ ROOT = HERE.parent                              # folder holding all clones
 # Defaults for the optional "config" block in sync-state.json (set by scripts/install.py).
 DEFAULTS = {
     "github_user": "danielzhang122",
-    "resume_repo": "resume",
+    "resume_repo": "resume-sync",
     "pdf_name": "Daniel_Zhang_Resume.pdf",
     "website_repo": "website",  # "" if there is no website repo
 }

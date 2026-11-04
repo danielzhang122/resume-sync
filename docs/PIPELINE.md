@@ -19,7 +19,7 @@ and the résumé a reviewed output of them.
 
 ```mermaid
 flowchart TD
-    A["Weekly schedule<br/>(cloud agent, Sundays 06:00)"] --> B["check.py<br/>diff every watched repo since its<br/>last-reviewed commit, drop the<br/>pipeline's own output files"]
+    A["Weekly schedule<br/>(cloud agent, Mondays 07:00 Eastern)"] --> B["check.py<br/>diff every watched repo since its<br/>last-reviewed commit, drop the<br/>pipeline's own output files"]
     B -->|nothing changed| Z["Stop: no commits, no PRs"]
     B -->|changed files| C["Agent reviews only those diffs<br/>against the rules in SYNC.md"]
     C -->|nothing résumé-worthy| S["Commit updated sync-state.json"]

@@ -62,7 +62,7 @@ Continue with only the repos the check listed.
 - `repos` in `sync-state.json` maps each watched repo to the last commit already reviewed.
 - If a repo isn't cloned, clone it beside this one: `git clone https://github.com/danielzhang122/<repo>`.
   For a new repo, review its whole content.
-- `resume` itself is watched: its README, `docs/`, `scripts/` and workflow describe this pipeline,
+- `resume-sync` (this repo) is watched: its README, `docs/`, `scripts/` and workflow describe this pipeline,
   which is one of Daniel's projects. Check that the website's description of it still matches and
   flag any mismatch in your summary. Daniel decided (2026-11-01) that the pipeline goes on the
   website only, **not on the résumé**: never add it to `resume.tex`.
@@ -99,7 +99,7 @@ repos, and set `last_run` to today's date (YYYY-MM-DD).
   The GitHub Action in this repo builds the PDF on the branch, commits `Daniel_Zhang_Resume.pdf`
   and `resume-preview.webp` back to it, and fails if the PDF is longer than one page. Always
   `git pull --rebase` before pushing to the branch again (the Action adds commits). After pushing,
-  wait for the Action (`https://api.github.com/repos/danielzhang122/resume/actions/runs?branch=<your branch>`);
+  wait for the Action (`https://api.github.com/repos/danielzhang122/resume-sync/actions/runs?branch=<your branch>`);
   if it failed because the page overflowed, tighten the text and push again.
 - If `resume.tex` did not change but SHAs advanced: commit only `sync-state.json` directly to
   `main` with message `Sync state: reviewed through <date>, no résumé changes`. This is bookkeeping

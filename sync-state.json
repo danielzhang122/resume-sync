@@ -2,12 +2,12 @@
   "last_run": "2026-11-02",
   "config": {
     "github_user": "danielzhang122",
-    "resume_repo": "resume",
+    "resume_repo": "resume-sync",
     "pdf_name": "Daniel_Zhang_Resume.pdf",
     "website_repo": "website"
   },
   "repos": {
-    "resume": "aa0971cbad65303c8ff72f386ad5288d9c9c520d",
+    "resume-sync": "aa0971cbad65303c8ff72f386ad5288d9c9c520d",
     "website": "9d93e058dc39c4186cb3c4985cefeab76eed7b23",
     "ontario-nuclear-dashboard": "8301fe3f40a583d6344892570b2139eec4cec9b4",
     "quadruped-robot": "a2e2dae3573fa993ca7ad1c494409aeb4de15e9e",
@@ -19,7 +19,7 @@
     "danielzhang122": "a6360acbceaa2815219233de4ebe2c5b3d5fcddf"
   },
   "exclude_paths": {
-    "resume": [
+    "resume-sync": [
       "resume.tex",
       "Daniel_Zhang_Resume.pdf",
       "resume-preview.webp",
