@@ -58,6 +58,14 @@ as new. Continue with only the repos the check listed.
   and audit the existing résumé against them; that audit is the most valuable PR this pipeline makes.
   Add repos that are clearly not résumé material (forks of tutorials, dotfiles, empty repos) to
   `ignore` instead of `repos`, and list them in the PR so {{FIRST_NAME}} can override.
+- **Declined changes.** `declined` in `sync-state.json` lists changes {{FIRST_NAME}} turned down.
+  First record new ones: list this repo's closed PRs whose title starts with `Résumé sync:` and that
+  were never merged (GitHub MCP tools or `gh pr list --state closed`). For each whose number isn't in
+  `declined` yet, add `{"pr": <number>, "change": "<its Decline key>", "closed": "<YYYY-MM-DD>"}`.
+  Never propose a change that matches a `declined` entry (same entry, same kind of edit). If new facts
+  make one worth raising again, say so in the run notes instead of opening a PR.
+- **Open PRs.** Open `Résumé sync:` PRs are changes still waiting for review. Don't propose them
+  again, and don't touch the lines they change.
 
 ### 2. Find what changed
 For each changed repo, start with `git log --oneline <last_sha>..HEAD` and
@@ -65,34 +73,50 @@ For each changed repo, start with `git log --oneline <last_sha>..HEAD` and
 pages, main source files); skip lockfiles, assets, generated files and data.
 If `last_sha` no longer exists (history rewritten), review the current README and code from scratch.
 
-### 3. Decide and edit
+### 3. Decide and split into changes
 - List each candidate change, mark it relevant or not, and give a one-line reason.
-- For relevant ones, edit `{{TEX_FILE}}` following the rules above. Also re-check existing résumé
-  bullets for the changed projects: if a bullet is now wrong or overstated, fix it.
-- Re-read the full `{{TEX_FILE}}` afterwards for consistency, tone and length.
+- Group the relevant edits into **changes**, one PR each, so {{FIRST_NAME}} can accept one and
+  decline another. A change is one logical edit: add, update or remove one entry, or fix one bullet.
+  Edits that only make sense together (adding an entry and archiving another to make room) are one
+  change.
+- **Changes never overlap.** Each edits different entries of `{{TEX_FILE}}` from every other change in
+  this run and from every open sync PR, with at least one unchanged line between them, so they merge
+  in any order without conflicts. If two candidates touch the same entry, make them one change, or
+  keep the more important one and leave the other for a later run.
+- **Each change stands alone.** Applied by itself to `main`, it must read correctly and keep the page
+  to one page. Prefer edits that don't lengthen the page; a change that adds length frees the same
+  space itself, so any combination that gets merged still fits.
+- Edit following the rules above. Also re-check existing bullets for the changed projects: if a bullet
+  is now wrong or overstated, that fix is a change too. Re-read each result for consistency, tone and
+  length.
 
-### 4. Update state
-Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new
-repos, and set `last_run` to today's date (YYYY-MM-DD).
+### 4. Update state (on `main`, never in a PR)
+Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
+and new `declined` entries, and set `last_run` to today's date (YYYY-MM-DD). Commit only
+`sync-state.json` directly to `main` with message `Sync state: reviewed through <date>` and push.
+Never change `{{TEX_FILE}}` on `main` directly. Keeping the state out of PRs means PRs never conflict
+with each other.
 
-### 5. Open or update the résumé PR
-- If `{{TEX_FILE}}` changed: if an open `Résumé sync` PR exists, check out its branch, pull, add
-  your commit on top and push (update that PR). Otherwise create a **new** branch
-  `resume-sync-<YYYY-MM-DD>` from `main` and open a PR into `main` titled
-  `Résumé sync: <short summary>`. Never reuse the name of a merged or closed PR's branch, and never
-  force-push. The PR body must include:
-  - **Changes:** each edited bullet as before → after, with the source (repo + commit link, or
+### 5. Open one PR per change
+- For each change, create a **new** branch `resume-sync-<YYYY-MM-DD>-<short-name>` from
+  `origin/main`, never from another PR's branch. Commit only `{{TEX_FILE}}`, push, and open a PR into
+  `main` titled `Résumé sync: <change>`. Never reuse the name of a merged or closed PR's branch, and
+  never force-push. The PR body must include:
+  - **Change:** each edited bullet as before → after, with the source (repo + commit link, or
     page) that supports it.
-  - **Considered but skipped:** relevant-looking changes you chose not to add, and why.
-  - **Inconsistencies found:** claims in READMEs{{OR_SITE_3}} that the code doesn't back up.
-  The GitHub Action in this repo builds the PDF on the branch, commits `{{PDF_NAME}}` and
-  `resume-preview.webp` back to it, and fails if the PDF is longer than one page. Always
-  `git pull --rebase` before pushing to the branch again (the Action adds commits). After pushing,
-  check the Action's run for your branch; if it failed because the page overflowed, tighten the
-  text and push again.
-- If `{{TEX_FILE}}` did not change but SHAs advanced: commit only `sync-state.json` directly to
-  `main` with message `Sync state: reviewed through <date>, no résumé changes`. Never change
-  `{{TEX_FILE}}` on `main` directly.
+  - **Decline key:** one line naming the entry and the kind of edit. It's what goes into `declined`
+    if the PR is closed without merging.
+  - The line "To decline, close this PR without merging. The next run records it and won't propose
+    it again."
+  - **Run notes**, in the run's first PR only (later PRs link to it): **Considered but skipped**
+    and **Inconsistencies found** (claims in READMEs{{OR_SITE_3}} that the code doesn't back up).
+- Update an open sync PR only to fix that same change; never add a different change to it.
+  `git pull --rebase` before pushing to it (the Action adds commits).
+- The GitHub Action builds the PDF on each PR branch, commits `{{PDF_NAME}}` and
+  `resume-preview.webp` back to it, and fails if the PDF is longer than one page. Whenever `main`'s
+  résumé changes, it merges `main` into every open `resume-sync-*` branch and rebuilds it. After
+  pushing, check the Action's run for your branch; if the page overflowed, tighten that PR's own text
+  and push again. Also check the latest build of every open sync PR and fix any that failed.
 
 <!-- website -->
 ### 6. Website PDF

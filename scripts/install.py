@@ -23,7 +23,9 @@ from pathlib import Path
 SRC = Path(__file__).resolve().parent.parent
 COPY = [
     "scripts/check.py",
+    "scripts/merge_main.sh",
     "tests/test_check.py",
+    "tests/test_merge_main.py",
     ".github/workflows/build.yml",
     ".github/workflows/test.yml",
 ]
@@ -130,6 +132,7 @@ def main() -> int:
         "repos": {a.resume_repo: head},
         "exclude_paths": excludes,
         "ignore": [],
+        "declined": [],
     }
     (target / "sync-state.json").write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 

@@ -7,7 +7,7 @@ their agent here, for example:
 
 What they get: a weekly agent that diffs their GitHub repos since last week, drafts résumé edits that
 cite the commit behind each claim, has CI build the PDF and fail if it runs past one page, and opens
-a pull request. It never merges anything. See [docs/PIPELINE.md](docs/PIPELINE.md) for the design.
+one pull request per change, so each can be merged or declined on its own. It never merges anything. See [docs/PIPELINE.md](docs/PIPELINE.md) for the design.
 
 Work through the steps in order. Ask the person only for what you can't find yourself, and confirm
 before anything outward-facing (creating a repo, pushing to `main`, scheduling the task).
