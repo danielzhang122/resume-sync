@@ -24,9 +24,12 @@ SRC = Path(__file__).resolve().parent.parent
 COPY = [
     "scripts/check.py",
     "scripts/merge_main.sh",
+    "scripts/website_pdf.sh",
     "tests/test_check.py",
     "tests/test_merge_main.py",
+    "tests/test_website_pdf.py",
     ".github/workflows/build.yml",
+    ".github/workflows/website-pdf.yml",
     ".github/workflows/test.yml",
 ]
 GITIGNORE = ["*.aux", "*.log", "*.out", "*.fls", "*.fdb_latexmk", "*.synctex.gz", "preview.png", "__pycache__/"]
@@ -111,11 +114,19 @@ def main() -> int:
         (target / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(SRC / rel, target / rel)
 
-    build = target / ".github/workflows/build.yml"
-    b = build.read_text(encoding="utf-8")
-    b = re.sub(r"(?m)^  TEX_FILE: .*$", f"  TEX_FILE: {a.tex}", b)
-    b = re.sub(r"(?m)^  PDF_NAME: .*$", f"  PDF_NAME: {a.pdf_name}", b)
-    build.write_text(b, encoding="utf-8")
+    settings = {
+        "TEX_FILE": a.tex,
+        "PDF_NAME": a.pdf_name,
+        "WEBSITE_REPO": a.website_repo,  # empty: the website job does nothing
+        "GIT_NAME": a.website_git_name or a.github_user,
+        "GIT_EMAIL": a.website_git_email or f"{a.github_user}@users.noreply.github.com",
+    }
+    for wf in ("build.yml", "website-pdf.yml"):
+        path = target / ".github/workflows" / wf
+        b = path.read_text(encoding="utf-8")
+        for k, v in settings.items():
+            b = re.sub(rf"(?m)^  {k}: .*$", lambda m: f'  {k}: "{v}"', b)
+        path.write_text(b, encoding="utf-8")
 
     (target / "SYNC.md").write_text(fill_sync(a), encoding="utf-8")
 

@@ -120,12 +120,11 @@ with each other.
 
 <!-- website -->
 ### 6. Website PDF
-The site serves `{{PDF_NAME}}` from the `{{WEBSITE_REPO}}` repo. Only act if step 0 printed
-`website-pdf stale`. If an open `Update résumé PDF` PR already carries the same PDF as this repo's
-`main`, do nothing. Otherwise, in the `{{WEBSITE_REPO}}` repo, on a **new** branch
-`resume-pdf-<YYYY-MM-DD>` from `main` (or the open PR's branch, pulled), copy `{{PDF_NAME}}` from
-this repo's `main` to the same path, open (or update) a PR into the website's `main` titled
-`Update résumé PDF` linking the résumé commit it came from, and touch nothing else there.
+The `Website PDF` GitHub Action copies `{{PDF_NAME}}` into the `{{WEBSITE_REPO}}` repo and opens (or
+updates) its `Update résumé PDF` PR by itself, once every sync PR is closed and `main`'s build has
+finished. **Don't open or edit website PRs.** If step 0 printed `website-pdf stale`, only check it's
+being handled: open sync PRs or an open `Update résumé PDF` PR both mean it is. If neither exists,
+say so in the notification instead of opening a PR.
 <!-- /website -->
 
 ### 7. Finish

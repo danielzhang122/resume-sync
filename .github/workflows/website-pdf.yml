@@ -1,0 +1,90 @@
+# Opens (or updates) the "Update résumé PDF" PR in the website repo, but only once every résumé
+# sync PR is closed and main's build has finished, so it never copies a PDF that's about to change.
+# Needs the secret WEBSITE_TOKEN (see INSTALL.md); does nothing when WEBSITE_REPO is empty.
+name: Website PDF
+
+on:
+  workflow_run:
+    workflows: ["Build résumé"]
+    types: [completed]
+    branches: [main]
+  pull_request_target:  # runs this file from main; no PR code is checked out
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
+
+concurrency:
+  group: website-pdf
+  cancel-in-progress: false
+
+# Per-person settings (scripts/install.py fills these in).
+env:
+  TEX_FILE: resume.tex
+  PDF_NAME: Daniel_Zhang_Resume.pdf
+  WEBSITE_REPO: website
+  GIT_NAME: danielzhang122
+  GIT_EMAIL: 98472640+danielzhang122@users.noreply.github.com
+
+jobs:
+  website-pdf:
+    # A merged sync PR is handled by the main build it triggers; a closed one runs right away.
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'pull_request_target' && startsWith(github.event.pull_request.head.ref, 'resume-sync-') && !github.event.pull_request.merged) ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      WEBSITE_TOKEN: ${{ secrets.WEBSITE_TOKEN }}
+      MAIN: ${{ github.event.repository.default_branch }}
+    steps:
+      - name: Decide whether to run
+        id: gate
+        run: |
+          if [ -z "$WEBSITE_REPO" ]; then echo "No website repo configured; nothing to do."; exit 0; fi
+          busy=$(gh run list -R "$GITHUB_REPOSITORY" --workflow build.yml --branch "$MAIN" --json status \
+            -q '[.[] | select(.status != "completed")] | length')
+          if [ "$busy" != "0" ]; then echo "Main's build is still running; its completion runs this again."; exit 0; fi
+          open=$(gh pr list -R "$GITHUB_REPOSITORY" --state open --json headRefName \
+            -q '[.[] | select(.headRefName | startswith("resume-sync-"))] | length')
+          if [ "$open" != "0" ]; then echo "Waiting: $open sync PRs open"; exit 0; fi
+          if [ -z "$WEBSITE_TOKEN" ]; then
+            echo "::error::Secret WEBSITE_TOKEN is missing. Create a fine-grained personal access token limited to $GITHUB_REPOSITORY_OWNER/$WEBSITE_REPO with Contents and Pull requests set to Read and write (github.com/settings/personal-access-tokens/new), then add it under this repo's Settings > Secrets and variables > Actions as WEBSITE_TOKEN."
+            exit 1
+          fi
+          echo "go=yes" >> "$GITHUB_OUTPUT"
+
+      - if: steps.gate.outputs.go == 'yes'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Copy the PDF into the website repo
+        if: steps.gate.outputs.go == 'yes'
+        id: copy
+        run: |
+          site="$GITHUB_REPOSITORY_OWNER/$WEBSITE_REPO"
+          git clone -q "https://x-access-token:$WEBSITE_TOKEN@github.com/$site.git" ../site
+          open_branch=$(GH_TOKEN="$WEBSITE_TOKEN" gh pr list -R "$site" --state open --json headRefName,title \
+            -q '[.[] | select(.title == "Update résumé PDF")][0].headRefName // ""')
+          echo "open_branch=$open_branch" >> "$GITHUB_OUTPUT"
+          bash scripts/website_pdf.sh . ../site "$PDF_NAME" "$TEX_FILE" "$open_branch"
+
+      - name: Open or update the PR
+        if: steps.copy.outputs.branch != ''
+        env:
+          BRANCH: ${{ steps.copy.outputs.branch }}
+          OPEN_BRANCH: ${{ steps.copy.outputs.open_branch }}
+        run: |
+          site="$GITHUB_REPOSITORY_OWNER/$WEBSITE_REPO"
+          body="Copies the résumé PDF and preview from $GITHUB_REPOSITORY commit $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$(git rev-parse HEAD)."
+          if [ -n "$OPEN_BRANCH" ]; then
+            GH_TOKEN="$WEBSITE_TOKEN" gh pr edit "$OPEN_BRANCH" -R "$site" --body "$body"
+          else
+            GH_TOKEN="$WEBSITE_TOKEN" gh pr create -R "$site" --base main --head "$BRANCH" --title "Update résumé PDF" --body "$body"
+          fi
