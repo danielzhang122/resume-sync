@@ -29,7 +29,7 @@ flowchart TD
     F -->|I close it| X["Recorded in declined;<br/>never proposed again"]
     F -->|I merge| G["main: résumé PDF"]
     G -->|other open PRs| E
-    G --> H["Next run: website PDF is stale →<br/>PR to the website repo"]
+    G --> H["Website PDF Action: once no sync PRs<br/>are open → PR to the website repo"]
     H -->|I merge| I["zhangdz.ca serves the new PDF"]
 ```
 
@@ -39,7 +39,8 @@ flowchart TD
 | State | Last-reviewed commit per repo, excluded paths, ignored repos, declined changes | [`sync-state.json`](../sync-state.json) |
 | Content rules and procedure | What may be claimed and how, step by step | [`SYNC.md`](../SYNC.md) |
 | Build and validation | GitHub Action: reproducible LaTeX build, one-page check, PDF + WebP preview; after a merge, refreshes the other open PRs from main | [`.github/workflows/build.yml`](../.github/workflows/build.yml), [`scripts/merge_main.sh`](../scripts/merge_main.sh) |
-| Tests | 12 unit tests on throwaway git repos, run in CI | [`tests/`](../tests), [`test.yml`](../.github/workflows/test.yml) |
+| Website PDF | GitHub Action: once no sync PR is open and main's build is done, copies the PDF and preview into the website repo and opens or updates one PR | [`.github/workflows/website-pdf.yml`](../.github/workflows/website-pdf.yml), [`scripts/website_pdf.sh`](../scripts/website_pdf.sh) |
+| Tests | 16 unit tests on throwaway git repos, run in CI | [`tests/`](../tests), [`test.yml`](../.github/workflows/test.yml) |
 | Orchestration | Scheduled Claude Code routine (cloud agent) that runs the procedure | configured on claude.ai |
 | Installer | Copies the pipeline into someone else's résumé repo and fills in a generic `SYNC.md` | [`scripts/install.py`](../scripts/install.py), [`INSTALL.md`](../INSTALL.md) |
 
@@ -64,6 +65,9 @@ flowchart TD
   them. The built PDF is the one file they all share: after each merge, CI merges `main` into the
   remaining PRs (taking `main`'s PDF), rebuilds them, and re-checks the one-page limit with what's
   already merged. State lives on `main`, outside the PRs.
+- **The website waits for my review.** The website PDF PR comes from a GitHub Action, not the agent,
+  and only after I've merged or closed every sync PR, so it carries the final PDF once instead of
+  one PR per merge.
 - **"No" is remembered.** Closing a sync PR without merging adds it to `declined` in
   `sync-state.json`, and the agent never proposes that change again unless I delete the entry.
 - **No force-pushes, ever.** Each new PR gets a fresh dated branch, and updates to an open PR are
@@ -82,8 +86,10 @@ flowchart TD
 - Only commits pushed to GitHub are seen. Work that only exists locally or offline isn't.
 - If GitHub's public API is unreachable from the cloud runner, new repos are found through the
   GitHub integration instead (a fallback, noted in `SYNC.md`).
-- While a website PDF PR is open and unmerged, each weekly run sees the stale PDF and does a short
-  check (about a minute) before concluding the open PR already covers it.
+- While sync PRs or a website PDF PR are open, each weekly run sees the stale PDF and only confirms
+  it's being handled; the agent never opens website PRs itself.
+- The website Action needs a personal access token (`WEBSITE_TOKEN`) because the workflow's own
+  token can't write to another repo.
 
 ## Verification
 

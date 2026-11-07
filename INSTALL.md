@@ -41,8 +41,8 @@ python3 scripts/install.py --target ../<their-resume-repo> --name "Jane Doe" --g
 ```
 
 Add `--tex`, `--pdf-name`, `--site-url`, `--website-repo`, `--website-git-name` and
-`--website-git-email` when they apply. The installer copies `scripts/check.py`, its tests and the two
-workflows; writes `SYNC.md` (the agent's instructions, filled in from `template/SYNC.md`) and a fresh
+`--website-git-email` when they apply. The installer copies the scripts, their tests and the three
+workflows (the `Website PDF` one does nothing without `--website-repo`); writes `SYNC.md` (the agent's instructions, filled in from `template/SYNC.md`) and a fresh
 `sync-state.json`; adds build artifacts to `.gitignore`; and adds one line after `\documentclass`
 so rebuilding unchanged source gives a byte-identical PDF. It refuses to overwrite existing files
 unless given `--force`.
@@ -59,6 +59,11 @@ Then, in their repo:
 5. Check the **Build résumé** Action ran green on GitHub (push a no-op `.tex` change or use
    *Run workflow* if it didn't trigger). In the repo's *Settings → Actions → General*, workflow
    permissions must allow **Read and write** so it can commit the PDF back.
+6. **Website only:** the `Website PDF` Action opens the website's PDF PR once every sync PR is
+   closed, and needs a token for the website repo. Have them create a fine-grained personal access
+   token limited to that repo with **Contents** and **Pull requests** set to *Read and write*, and
+   add it to the résumé repo as the Actions secret `WEBSITE_TOKEN`. Without it, that Action fails
+   with a message saying exactly this.
 
 ## 4. Schedule the weekly agent
 

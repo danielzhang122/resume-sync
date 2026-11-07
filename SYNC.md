@@ -30,7 +30,7 @@ exactly. You never merge anything. Daniel reviews and merges every pull request 
    the résumé. Flag it in the PR under "Inconsistencies found" instead (don't edit those repos).
 7. **Escape LaTeX properly:** `\&`, `\%`, `\$`, `\#`, `\_`, `C\texttt{++}`, `1,000\texttt{+}`,
    `--` for date ranges, `CO\textsubscript{2}`.
-8. **Commit as Daniel, in this repo and in `website` (step 6).** Before your first commit in each,
+8. **Commit as Daniel in this repo.** Before your first commit,
    run `git config user.name "danielzhang122"` and
    `git config user.email "98472640+danielzhang122@users.noreply.github.com"`.
    Add no `Co-Authored-By` or session lines to commit messages.
@@ -140,21 +140,16 @@ declines or leaves a PR open (open PRs and `declined` remember the outcome).
   PRs after opening.
 
 ### 6. Website PDF
-The site serves `Daniel_Zhang_Resume.pdf` and `images/resume-preview.webp` from the `website` repo.
-Only act if step 0 printed `website-pdf stale`. If an open `Update résumé PDF` PR already carries
-the same PDF as this repo's `main`, do nothing (no duplicate PRs, no empty commits). Otherwise:
-- In the `website` repo, on a **new** branch `resume-pdf-<YYYY-MM-DD>` from `main` (or the open
-  PR's branch, pulled, if one exists with an older PDF; never reuse a merged PR's branch and never
-  force-push), copy `Daniel_Zhang_Resume.pdf` and
-  `resume-preview.webp` (to `images/resume-preview.webp`) from this repo's `main`, and update the
-  line "PDF, one page, updated <Mon YYYY>." in `index.html` to the month of this repo's last
-  commit that changed `resume.tex` (only if the month actually differs).
-- Open (or update) a PR into the website's `main` titled `Update résumé PDF`, linking the
-  résumé commit it came from. Touch nothing else in the website repo.
+The `Website PDF` GitHub Action opens (or updates) the website's `Update résumé PDF` PR by itself,
+once every sync PR is closed and `main`'s build has finished. **Don't open or edit website PRs.**
+If step 0 printed `website-pdf stale`, only check it's being handled: open sync PRs (the Action is
+waiting for Daniel) or an open `Update résumé PDF` PR both mean it is. If neither exists, say so
+in the notification (e.g. "website PDF is stale but no PR was opened; check the Website PDF
+Action") instead of opening a PR.
 
 ### 7. Finish
 End with a short summary: repos checked, changes proposed, PRs opened or updated, inconsistencies.
 **Always** send Daniel a push notification (the `PushNotification` tool), even when nothing changed.
 Keep it to one or two lines, e.g. "Résumé sync: nothing changed this week." or "Résumé sync: 2 PRs
-to review (subtitle-sync, Chem-E-Car bullet), website PDF PR opened." If the run fails partway, notify with what
+to review (subtitle-sync, Chem-E-Car bullet)." If the run fails partway, notify with what
 broke.
