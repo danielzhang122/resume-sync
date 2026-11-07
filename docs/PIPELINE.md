@@ -2,9 +2,9 @@
 
 A small CI/CD system that keeps my résumé consistent with what my GitHub repos and portfolio site
 actually say. Once a week it checks every project repo for new commits. If something changed that
-belongs on a résumé, it drafts the edit, and CI builds and checks the PDF. The edit arrives as a
-pull request that cites the commit behind every claim. Nothing reaches the résumé or the website
-until I merge it.
+belongs on a résumé, it drafts the edit, and CI builds and checks the PDF. Each change arrives as
+its own pull request that cites the commit behind every claim, so I can accept one and decline
+another. Nothing reaches the résumé or the website until I merge it.
 
 ## Why
 
@@ -22,11 +22,13 @@ flowchart TD
     A["Weekly schedule<br/>(cloud agent, Mondays 07:00 Eastern)"] --> B["check.py<br/>diff every watched repo since its<br/>last-reviewed commit, drop the<br/>pipeline's own output files"]
     B -->|nothing changed| Z["Stop: no commits, no PRs"]
     B -->|changed files| C["Agent reviews only those diffs<br/>against the rules in SYNC.md"]
-    C -->|nothing résumé-worthy| S["Commit updated sync-state.json"]
-    C -->|relevant change| D["Edit resume.tex on a new branch<br/>resume-sync-YYYY-MM-DD"]
+    C --> S["Commit updated sync-state.json to main"]
+    C -->|relevant changes| D["One branch per change from main<br/>resume-sync-YYYY-MM-DD-name,<br/>never touching the same lines"]
     D --> E["GitHub Action: compile LaTeX,<br/>fail if longer than 1 page,<br/>render PDF + preview, commit back"]
-    E --> F["Pull request: each edit as before → after,<br/>with the commit that supports it"]
-    F -->|I review and merge| G["main: résumé PDF"]
+    E --> F["One pull request per change: before → after,<br/>with the commit that supports it"]
+    F -->|I close it| X["Recorded in declined;<br/>never proposed again"]
+    F -->|I merge| G["main: résumé PDF"]
+    G -->|other open PRs| E
     G --> H["Next run: website PDF is stale →<br/>PR to the website repo"]
     H -->|I merge| I["zhangdz.ca serves the new PDF"]
 ```
@@ -34,10 +36,10 @@ flowchart TD
 | Piece | What it is | File |
 |---|---|---|
 | Change detection | Python script, no AI: diffs each watched repo since the commit last reviewed, minus excluded paths | [`scripts/check.py`](../scripts/check.py) |
-| State | Last-reviewed commit per repo, excluded paths, ignored repos | [`sync-state.json`](../sync-state.json) |
+| State | Last-reviewed commit per repo, excluded paths, ignored repos, declined changes | [`sync-state.json`](../sync-state.json) |
 | Content rules and procedure | What may be claimed and how, step by step | [`SYNC.md`](../SYNC.md) |
-| Build and validation | GitHub Action: reproducible LaTeX build, one-page check, PDF + WebP preview | [`.github/workflows/build.yml`](../.github/workflows/build.yml) |
-| Tests | 9 unit tests on throwaway git repos, run in CI | [`tests/test_check.py`](../tests/test_check.py), [`test.yml`](../.github/workflows/test.yml) |
+| Build and validation | GitHub Action: reproducible LaTeX build, one-page check, PDF + WebP preview; after a merge, refreshes the other open PRs from main | [`.github/workflows/build.yml`](../.github/workflows/build.yml), [`scripts/merge_main.sh`](../scripts/merge_main.sh) |
+| Tests | 12 unit tests on throwaway git repos, run in CI | [`tests/`](../tests), [`test.yml`](../.github/workflows/test.yml) |
 | Orchestration | Scheduled Claude Code routine (cloud agent) that runs the procedure | configured on claude.ai |
 | Installer | Copies the pipeline into someone else's résumé repo and fills in a generic `SYNC.md` | [`scripts/install.py`](../scripts/install.py), [`INSTALL.md`](../INSTALL.md) |
 
@@ -57,6 +59,13 @@ flowchart TD
   project, so changes to it are reviewed like any other.
 - **Reproducible builds.** `resume.tex` tells pdfTeX to leave the build date and random file ID out
   of the PDF, so rebuilding unchanged source produces a byte-identical file and no new commit.
+- **One change per PR, and PRs never overlap.** Each change gets its own branch from `main` and
+  edits different lines from every other open PR, so I can merge them in any order or close any of
+  them. The built PDF is the one file they all share: after each merge, CI merges `main` into the
+  remaining PRs (taking `main`'s PDF), rebuilds them, and re-checks the one-page limit with what's
+  already merged. State lives on `main`, outside the PRs.
+- **"No" is remembered.** Closing a sync PR without merging adds it to `declined` in
+  `sync-state.json`, and the agent never proposes that change again unless I delete the entry.
 - **No force-pushes, ever.** Each new PR gets a fresh dated branch, and updates to an open PR are
   plain fast-forward pushes. A merged PR's branch is never reused.
 - **Claude gets credit; the wording is mine.** The agent commits to this repo as Claude, so it shows
@@ -101,4 +110,5 @@ of deliberate tests, not from a long track record.
 
 Before: edit LaTeX, export the PDF, copy it into the website repo, regenerate the preview image,
 update the "updated" date, push, and remember to cross-check every repo by hand (I didn't, which
-is how the false claim survived). Now: review and merge up to two pull requests, each with sources.
+is how the false claim survived). Now: review a few small pull requests, one per change, each with
+sources, and merge or close each one.

@@ -1,5 +1,7 @@
 # Builds the LaTeX résumé into a PDF and resume-preview.webp,
 # fails if the PDF is longer than one page, and commits both files back to the branch that was pushed.
+# When main's résumé changes (a PR was merged), it also merges main into every open résumé-sync PR
+# branch and rebuilds it, so those PRs stay mergeable and their one-page check includes what's merged.
 name: Build résumé
 
 on:
@@ -11,21 +13,62 @@ on:
 
 permissions:
   contents: write
+  pull-requests: read
 
 # The only per-person settings (scripts/install.py fills these in).
 env:
   TEX_FILE: resume.tex
   PDF_NAME: Daniel_Zhang_Resume.pdf
 
-concurrency:
-  group: build-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  build:
+  plan:
     runs-on: ubuntu-latest
+    outputs:
+      refs: ${{ steps.refs.outputs.refs }}
+    steps:
+      - id: refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MAIN: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$GITHUB_REF_NAME" = "$MAIN" ]; then
+            gh pr list -R "$GITHUB_REPOSITORY" --state open --base "$MAIN" --json headRefName > prs.json
+          else
+            echo '[]' > prs.json
+          fi
+          refs=$(python3 -c 'import json, os, sys
+          prs = [p["headRefName"] for p in json.load(open("prs.json")) if p["headRefName"].startswith("resume-sync-")]
+          print(json.dumps([os.environ["GITHUB_REF_NAME"], *prs]))')
+          echo "refs=$refs" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: plan
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.plan.outputs.refs) }}
+    concurrency:
+      group: build-${{ matrix.ref }}
+      cancel-in-progress: true
+    env:
+      REF: ${{ matrix.ref }}
+      MAIN: ${{ github.event.repository.default_branch }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          fetch-depth: 0
+
+      - name: Set commit identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+
+      # Only the sync agent's branches; any other branch is built as it is.
+      - name: Merge main into a résumé-sync PR branch
+        if: startsWith(matrix.ref, 'resume-sync-')
+        run: bash scripts/merge_main.sh "origin/$MAIN" "$PDF_NAME" resume-preview.webp
 
       # resume.tex itself omits the build date and random ID from the PDF, so rebuilding
       # unchanged source gives a byte-identical PDF and the commit step below finds nothing to commit.
@@ -55,12 +98,10 @@ jobs:
 
       - name: Commit PDF and preview back to the branch
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add "$PDF_NAME" resume-preview.webp
-          if git diff --cached --quiet; then
+          git diff --cached --quiet || git commit -q -m "Build résumé PDF and preview"
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse "origin/$REF")" ]; then
             echo "Nothing changed."
           else
-            git commit -m "Build résumé PDF and preview"
-            git push
+            git push origin "HEAD:refs/heads/$REF"
           fi
