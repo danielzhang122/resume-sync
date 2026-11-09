@@ -7,7 +7,7 @@
     "website_repo": "website"
   },
   "repos": {
-    "resume-sync": "569d7bdabaf2d63bcc6253bee7af0cb3db50bd6d",
+    "resume-sync": "7e0ed5bd0b3c9fb12c8775aecf2faea16ea96941",
     "website": "ce445e7b4894be29e7921042428fcc20a87df4a2",
     "ontario-nuclear-dashboard": "2d95ebb91142be43197b3179f8298c29b6841c9c",
     "quadruped-robot": "a2e2dae3573fa993ca7ad1c494409aeb4de15e9e",
@@ -20,7 +20,8 @@
     "subtitle-sync": "31a8a7187f6ecc91ec9650d98020a19e3bf3ce28",
     "subtitle-sync-server": "702255fe67240bd945e2fca7f8a91e5a0950af1c",
     "daniel-lm": "ba9ab20c2bcdfee6a2d2b8a785a0dea0ec985b01",
-    "pdf-liberator": "13adc374bb9deafc912c8b366bee6df860191dd0"
+    "pdf-liberator": "13adc374bb9deafc912c8b366bee6df860191dd0",
+    "candu-anatomy": "e22f96429db60794a82d1d3446cc8dcccb30ad4c"
   },
   "exclude_paths": {
     "resume-sync": [
