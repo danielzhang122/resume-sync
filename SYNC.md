@@ -46,7 +46,11 @@ exactly. You never merge anything. Daniel reviews and merges every pull request 
 Keep token use low: don't read files you don't need, and stop as soon as there's nothing to do.
 
 ### 0. Quick check (always first)
-From this repo's folder run `python3 scripts/check.py`. It reads `sync-state.json`, pulls every
+First, if an open PR titled `Sync state: …` exists (GitHub MCP `list_pull_requests`, state `open`),
+its branch holds the newest state that Daniel hasn't merged yet: run
+`git fetch origin <its branch>` and `git checkout origin/<its branch> -- sync-state.json`, so you don't
+re-review what that run already covered (step 4 then updates that same PR).
+Then, from this repo's folder, run `python3 scripts/check.py`. It reads `sync-state.json`, pulls every
 watched repo (all cloned beside this one), and prints one line per thing to do:
 `changed <repo> <files>`, `new <repo>`, `website-pdf stale`. Files listed in `exclude_paths` are the
 pipeline's own outputs (the résumé source and PDF, the state file, the website's copy of the PDF),
@@ -100,16 +104,20 @@ proves a claim. Skip repos with no new commits.
   is now wrong or overstated, that fix is a change too. Re-read each result for consistency, tone and
   length.
 
-### 4. Update state (on `main`, never in a PR)
+### 4. Update state (in its own PR; never push to `main`)
 Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
-and new `declined` entries, and set `last_run` to today's date (YYYY-MM-DD). Commit only
-`sync-state.json` directly to `main` with message `Sync state: reviewed through <date>`, then push
-it with exactly `git push origin main`, run as its own command (not chained with `&&`, not `HEAD:main`,
-not from another branch). That exact command is pre-approved in `.claude/settings.json`; any other form
-is blocked. If it is still blocked, say so in the notification; never push the state to a side branch.
-This is bookkeeping only; never change `resume.tex` on `main` directly. Keeping the state out of PRs
-means PRs never conflict with each other, and the reviewed commits move on whether Daniel merges,
-declines or leaves a PR open (open PRs and `declined` remember the outcome).
+and new `declined` entries, and set `last_run` to today's date (YYYY-MM-DD). Claude Code blocks pushes
+to `main`, so the state goes through a PR that Daniel merges:
+- If an open `Sync state: …` PR exists (see step 0), check out its branch, commit the new
+  `sync-state.json` on top, push that branch (plain push, never force), and retitle the PR
+  `Sync state: reviewed through <today>`. Never open a second state PR.
+- Otherwise create branch `sync-state-<YYYY-MM-DD>` from `origin/main`, commit only `sync-state.json`
+  with message `Sync state: reviewed through <date>`, push it, and open a PR into `main` titled
+  `Sync state: reviewed through <date>` with the body: "Bookkeeping only (`sync-state.json`): records
+  which commits this run reviewed. Merge it so the next run doesn't review them again."
+- Never put `sync-state.json` in a résumé PR, and never change `resume.tex` on `main` directly. The
+  state PR only touches `sync-state.json`, so it never conflicts with résumé PRs.
+- Skip this step entirely when step 0 printed `NOTHING TO SYNC`.
 
 ### 5. Open one PR per change
 - For each change, create a **new** branch `resume-sync-<YYYY-MM-DD>-<short-name>` (e.g.
@@ -154,5 +162,5 @@ Action") instead of opening a PR.
 End with a short summary: repos checked, changes proposed, PRs opened or updated, inconsistencies.
 **Always** send Daniel a push notification (the `PushNotification` tool), even when nothing changed.
 Keep it to one or two lines, e.g. "Résumé sync: nothing changed this week." or "Résumé sync: 2 PRs
-to review (subtitle-sync, Chem-E-Car bullet)." If the run fails partway, notify with what
+to review (subtitle-sync, Chem-E-Car bullet) + state PR to merge." If the run fails partway, notify with what
 broke.

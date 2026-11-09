@@ -22,7 +22,7 @@ flowchart TD
     A["Weekly schedule<br/>(cloud agent, Mondays 07:00 Eastern)"] --> B["check.py<br/>diff every watched repo since its<br/>last-reviewed commit, drop the<br/>pipeline's own output files"]
     B -->|nothing changed| Z["Stop: no commits, no PRs"]
     B -->|changed files| C["Agent reviews only those diffs<br/>against the rules in SYNC.md"]
-    C --> S["Commit updated sync-state.json to main"]
+    C --> S["Open or update the Sync state PR"]
     C -->|relevant changes| D["One branch per change from main<br/>resume-sync-YYYY-MM-DD-name,<br/>never touching the same lines"]
     D --> E["GitHub Action: compile LaTeX,<br/>fail if longer than 1 page,<br/>render PDF + preview, commit back"]
     E --> F["One pull request per change: before → after,<br/>with the commit that supports it"]
