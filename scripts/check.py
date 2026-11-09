@@ -52,6 +52,14 @@ def public_repos(user: str = DEFAULTS["github_user"]) -> list[dict] | None:
         with urllib.request.urlopen(url, timeout=15) as r:
             return json.load(r)
     except Exception:
+        pass
+    # Cloud sessions block the endpoint above but allow GitHub search through the gh CLI.
+    try:
+        out = subprocess.run(
+            ["gh", "api", f"search/repositories?q=user:{user}&per_page=100", "--jq", ".items"],
+            capture_output=True, text=True, timeout=30, check=True).stdout
+        return [r for r in json.loads(out) if not r.get("private")]
+    except Exception:
         return None
 
 
