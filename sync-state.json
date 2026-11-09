@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-11-07",
+  "last_run": "2026-11-09",
   "config": {
     "github_user": "danielzhang122",
     "resume_repo": "resume-sync",
@@ -7,9 +7,9 @@
     "website_repo": "website"
   },
   "repos": {
-    "resume-sync": "be84225952b95e048c765475b500baaed6dbe50c",
-    "website": "791536b4bb0d3f790c1b7b7e4e2dbf92a3da8141",
-    "ontario-nuclear-dashboard": "8301fe3f40a583d6344892570b2139eec4cec9b4",
+    "resume-sync": "569d7bdabaf2d63bcc6253bee7af0cb3db50bd6d",
+    "website": "ce445e7b4894be29e7921042428fcc20a87df4a2",
+    "ontario-nuclear-dashboard": "2d95ebb91142be43197b3179f8298c29b6841c9c",
     "quadruped-robot": "a2e2dae3573fa993ca7ad1c494409aeb4de15e9e",
     "globe-ghost": "537c79ffc86982e1ec669ebb5ff1941b41486544",
     "sfwreng-3k04-pacemaker": "7cdaaaf923a24b3af6d9c753b83015b4aea440b0",
@@ -18,7 +18,9 @@
     "junk-drawer": "cc9928c478eafb97193a6c269c466fa07d78c87b",
     "danielzhang122": "237cd3e68cd67e0b094c469679d476341ef3e90c",
     "subtitle-sync": "31a8a7187f6ecc91ec9650d98020a19e3bf3ce28",
-    "subtitle-sync-server": "702255fe67240bd945e2fca7f8a91e5a0950af1c"
+    "subtitle-sync-server": "702255fe67240bd945e2fca7f8a91e5a0950af1c",
+    "daniel-lm": "ba9ab20c2bcdfee6a2d2b8a785a0dea0ec985b01",
+    "pdf-liberator": "13adc374bb9deafc912c8b366bee6df860191dd0"
   },
   "exclude_paths": {
     "resume-sync": [
@@ -36,7 +38,14 @@
     "claude-config",
     "danielzhang122.github.io",
     "SFWRENG-3k04-Project",
-    "sfwreng-2md3"
+    "sfwreng-2md3",
+    "daniel-lm-private-archive"
   ],
-  "declined": []
+  "declined": [
+    {
+      "pr": 11,
+      "change": "Add subtitle-sync, archive Pacemaker",
+      "closed": "2026-11-07"
+    }
+  ]
 }
