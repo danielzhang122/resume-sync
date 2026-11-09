@@ -6,7 +6,7 @@ disable-model-invocation: true
 ---
 
 Daniel wants the résumé sync bot to do its vet now. The bot is the claude.ai scheduled task
-**Weekly résumé sync**, trigger ID `trig_01CL6rNXRC54CaHcJ6zoBgAG`. It follows `SYNC.md` in the
+**Weekly résumé sync**, trigger ID `trig_01CoWH9LNR5gwrGuDC34ChNZ`. It follows `SYNC.md` in the
 `resume-sync` repo and opens PRs; it never merges.
 
 Arguments given: `$ARGUMENTS`
