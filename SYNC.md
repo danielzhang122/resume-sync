@@ -103,7 +103,10 @@ proves a claim. Skip repos with no new commits.
 ### 4. Update state (on `main`, never in a PR)
 Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
 and new `declined` entries, and set `last_run` to today's date (YYYY-MM-DD). Commit only
-`sync-state.json` directly to `main` with message `Sync state: reviewed through <date>` and push.
+`sync-state.json` directly to `main` with message `Sync state: reviewed through <date>`, then push
+it with exactly `git push origin main`, run as its own command (not chained with `&&`, not `HEAD:main`,
+not from another branch). That exact command is pre-approved in `.claude/settings.json`; any other form
+is blocked. If it is still blocked, say so in the notification; never push the state to a side branch.
 This is bookkeeping only; never change `resume.tex` on `main` directly. Keeping the state out of PRs
 means PRs never conflict with each other, and the reviewed commits move on whether Daniel merges,
 declines or leaves a PR open (open PRs and `declined` remember the outcome).
