@@ -14,4 +14,4 @@ __pycache__/
 .vscode/
 
 # Unofficial transcript (private, never commit)
-MCM_TS_MCOFF.pdf
+MCM_TS_*.pdf
