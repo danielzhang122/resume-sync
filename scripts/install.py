@@ -25,6 +25,8 @@ COPY = [
     "scripts/check.py",
     "scripts/merge_main.sh",
     "scripts/website_pdf.sh",
+    "scripts/page_check.sh",
+    "scripts/wait_build.sh",
     "tests/test_check.py",
     "tests/test_merge_main.py",
     "tests/test_website_pdf.py",

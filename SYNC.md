@@ -40,6 +40,16 @@ exactly. You never merge anything. Daniel reviews and merges every pull request 
 10. **Daniel rewords your drafts.** He rewords drafted bullets in his own voice before merging so the résumé
    doesn't read like AI output. Don't revert his wording to your draft or "polish" it; only edit a
    bullet he reworded if its facts no longer match the repos.
+11. **Jobs and teams, not just projects.** Experience entries (jobs, co-ops, design teams) change
+   too. Sources for them: the site's Experience section (`site experience` lines from step 0) and
+   any repo tied to that job. A repo is tied to a job when it is in `links` in `sync-state.json`, or
+   when its README or description names an employer, client, site or team on the résumé (e.g. a
+   tool built at a co-op, CAD or code for a design team). Put what such a repo shows into that
+   job's entry, not a new project entry, and add the repo to `links` (`"<repo>": "<entry>"`) in
+   the state PR so later runs know.
+12. **Private repos** count like public ones, but never link them on the résumé and never copy
+   client data, part lists or internal names from them. Use what they show you built and the scale
+   (counts, tools); if the site describes the same work, stay consistent with it.
 
 ## Procedure
 
@@ -52,7 +62,7 @@ its branch holds the newest state that Daniel hasn't merged yet: run
 re-review what that run already covered (step 4 then updates that same PR).
 Then, from this repo's folder, run `python3 scripts/check.py`. It reads `sync-state.json`, pulls every
 watched repo (all cloned beside this one), and prints one line per thing to do:
-`changed <repo> <files>`, `new <repo>`, `website-pdf stale`. Files listed in `exclude_paths` are the
+`changed <repo> <files>`, `new <repo>` (`(private)` and `-> <job>` when they apply), `website-pdf stale`, and `site <section> -/+ <text>`. Files listed in `exclude_paths` are the
 pipeline's own outputs (the résumé source and PDF, the state file, the website's copy of the PDF),
 so the pipeline's own commits never count as changes. If the output ends with `NOTHING TO SYNC`, send
 the step 7 notification ("Résumé sync: nothing changed this week."), end the run with "Nothing to
@@ -61,6 +71,11 @@ sync." and **commit nothing**. If it prints
 GitHub MCP tool (`mcp__github__search_repositories`, query
 `user:danielzhang122 fork:false archived:false`) and treat any name not in `repos` or `ignore` as new.
 Continue with only the repos the check listed.
+
+Lines starting `site <section> -` / `site <section> +` are the exact text that changed on the
+website (old / new), section by section. Read every one: a single reworded sentence in Experience
+or Projects is a résumé change even when the same run's other website commits are only styling.
+Never dismiss the website as "cosmetic" without going through these lines.
 
 ### 1. Load state
 - `repos` in `sync-state.json` maps each watched repo to the last commit already reviewed.
@@ -103,6 +118,10 @@ proves a claim. Skip repos with no new commits.
 - Edit following the rules above. Also re-check existing bullets for the changed projects: if a bullet
   is now wrong or overstated, that fix is a change too. Re-read each result for consistency, tone and
   length.
+- **Rewrite until it fits on one page, before you push.** With only that change applied, run
+  `bash scripts/page_check.sh`. If it says more than 1 page, it prints what spilled onto page 2:
+  tighten the text you changed (or archive weaker content per rule 5) and run it again. Repeat until
+  it prints `Pages: 1`. Only then commit and push. (The first run installs LaTeX, about a minute.)
 
 ### 4. Update state (in its own PR; never push to `main`)
 Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
@@ -141,18 +160,19 @@ to `main`, so the state goes through a PR that Daniel merges:
 - The GitHub Action builds the PDF on each PR branch, commits `Daniel_Zhang_Resume.pdf` and
   `resume-preview.webp` back to it, and fails if the PDF is longer than one page. Whenever `main`'s
   résumé changes (a PR was merged), it merges `main` into every open `resume-sync-*` branch and
-  rebuilds it, so the other PRs stay mergeable and their page check includes what's merged. After
-  pushing, wait for the Action
-  (`https://api.github.com/repos/danielzhang122/resume-sync/actions/runs?branch=<your branch>`); if
-  the page overflowed, tighten that PR's own text and push again. Also check the latest build of
-  every open sync PR: if one failed (usually because a merged PR overflowed the page), fix it on its
-  branch.
-- **A PR is not done until its build is green** and the branch has the Action's
-  `Build résumé PDF and preview` commit. A failed build means the PDF was never updated: neither on
-  the PR nor, after merge, on `main` or the website. Never end the run with a sync PR whose latest
-  build failed or hasn't finished; if you can't get it green, put "BUILD FAILED: <PR>, PDF not
-  updated" first in the step 7 notification. Also check `main`'s latest `Build résumé` run; if it
-  failed, open a `Résumé sync: fix build on main` PR that tightens the text.
+  rebuilds it, so the other PRs stay mergeable and their page check includes what's merged.
+- **After every push, wait for the build with `bash scripts/wait_build.sh <branch>`** (one command;
+  it waits up to 10 minutes). Never use `sleep`: the cloud blocks it, so it returns at once and you
+  would end the run before the build finishes. If it prints `Build FAILED`, the page overflowed in
+  CI: run `bash scripts/page_check.sh`, tighten, commit, push, and run `wait_build.sh` again. Keep
+  going until it prints `Build passed`. A failed build means the PDF was never updated, neither on
+  the PR nor, after merge, on `main` or the website.
+- Also check the latest build of every open sync PR and of `main` (GitHub MCP `actions_list`,
+  workflow `build.yml`). If one failed (usually because a merged PR overflowed the page), fix it the
+  same way: on that PR's branch, or for `main` in a new `Résumé sync: fix build on main` PR.
+- Never end the run while a sync PR's build is failing or unfinished. If after three rewrites it
+  still fails, or `wait_build.sh` can't get a result, put "BUILD FAILED: <PR>, PDF not updated"
+  first in the step 7 notification.
 - No AI attribution in this repo or in `website`: strip any "Generated by Claude Code" footer from
   PRs after opening.
 

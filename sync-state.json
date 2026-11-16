@@ -22,7 +22,8 @@
     "daniel-lm": "b5d31664e8e1a5baf77385334bd8d9d2debcbd73",
     "pdf-liberator": "13adc374bb9deafc912c8b366bee6df860191dd0",
     "candu-anatomy": "6d6b75838f589688d0cd58ade8df275c16c29f9c",
-    "radioisotope-workshop": "2441909dd29ec905e7378ffeebfcfee1fe59b3df"
+    "radioisotope-workshop": "2441909dd29ec905e7378ffeebfcfee1fe59b3df",
+    "sbwrs-label-tracker": "798f81dac06b226416ee080f91e08219c7cb9349"
   },
   "exclude_paths": {
     "resume-sync": [
@@ -49,5 +50,8 @@
       "change": "Add subtitle-sync, archive Pacemaker",
       "closed": "2026-11-07"
     }
-  ]
+  ],
+  "links": {
+    "sbwrs-label-tracker": "Eclipse Automation"
+  }
 }

@@ -98,6 +98,29 @@ class CheckTest(unittest.TestCase):
         ]
         self.assertEqual(self.run_check(repos), ["new brand-new"])
 
+    def test_private_repo_found_and_linked_to_a_job(self):
+        # Work tools are often private repos; they still count, and `links` names the job they belong to.
+        state = json.loads((self.root / "resume-sync" / "sync-state.json").read_text())
+        state["links"] = {"label-tracker": "Eclipse Automation"}
+        (self.root / "resume-sync" / "sync-state.json").write_text(json.dumps(state))
+        repos = [{"name": "label-tracker", "fork": False, "archived": False, "private": True}]
+        self.assertEqual(self.run_check(repos), ["new label-tracker (private) -> Eclipse Automation"])
+
+    def test_site_text_change_is_spelled_out(self):
+        page = """<section data-cmd="experience"><h2>Experience</h2>
+          <div class="row"><p><b>Intern</b>, Eclipse</p><p class="dim">Did FEA &amp; FMEAs.</p></div>
+        </section><section data-cmd="art"><p>ascii</p></section>"""
+        commit(self.root / "website", {"index.html": page})
+        self.heads["website"] = git(self.root / "website", "rev-parse", "HEAD")
+        self.write_state()
+        commit(self.root / "website", {"index.html": page.replace("FMEAs.", "FMEAs. Built a shipping tracker.")
+                                                           .replace("ascii", "new art"), "css/x.css": "a{}"})
+        self.assertEqual(self.run_check(), [
+            "changed website css/x.css index.html",
+            "site experience - Did FEA & FMEAs.",
+            "site experience + Did FEA & FMEAs. Built a shipping tracker.",
+        ])
+
     def test_repo_list_unavailable_is_not_a_finding(self):
         out = check.check(self.root / "resume-sync", self.root, lambda: None)
         self.assertEqual(out, ["repo-list unavailable", "NOTHING TO SYNC"])
