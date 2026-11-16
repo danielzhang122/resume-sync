@@ -29,7 +29,7 @@ flowchart TD
     F -->|I close it| X["Recorded in declined;<br/>never proposed again"]
     F -->|I merge| G["main: résumé PDF"]
     G -->|other open PRs| E
-    G --> H["Website PDF Action: once no sync PRs<br/>are open → PR to the website repo"]
+    G --> H["Website PDF Action: whenever main's PDF<br/>changes → PR to the website repo"]
     H -->|I merge| I["zhangdz.ca serves the new PDF"]
 ```
 
@@ -66,8 +66,8 @@ flowchart TD
   remaining PRs (taking `main`'s PDF), rebuilds them, and re-checks the one-page limit with what's
   already merged. State lives on `main`, outside the PRs.
 - **The website waits for my review.** The website PDF PR comes from a GitHub Action, not the agent,
-  and only after I've merged or closed every sync PR, so it carries the final PDF once instead of
-  one PR per merge.
+  every time `main`'s PDF changes. There is only ever one: later changes update that same PR, so
+  it always carries the latest PDF.
 - **"No" is remembered.** Closing a sync PR without merging adds it to `declined` in
   `sync-state.json`, and the agent never proposes that change again unless I delete the entry.
 - **No force-pushes, ever.** Each new PR gets a fresh dated branch, and updates to an open PR are
@@ -86,8 +86,8 @@ flowchart TD
 - Only commits pushed to GitHub are seen. Work that only exists locally or offline isn't.
 - If GitHub's public API is unreachable from the cloud runner, new repos are found through the
   GitHub integration instead (a fallback, noted in `SYNC.md`).
-- While sync PRs or a website PDF PR are open, each weekly run sees the stale PDF and only confirms
-  it's being handled; the agent never opens website PRs itself.
+- While a website PDF PR is open, each weekly run sees the stale PDF and only confirms it's being
+  handled; the agent never opens website PRs itself.
 - The website Action needs a personal access token (`WEBSITE_TOKEN`) because the workflow's own
   token can't write to another repo.
 

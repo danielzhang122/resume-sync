@@ -150,10 +150,10 @@ with each other.
 <!-- website -->
 ### 6. Website PDF
 The `Website PDF` GitHub Action copies `{{PDF_NAME}}` into the `{{WEBSITE_REPO}}` repo and opens (or
-updates) its `Update résumé PDF` PR by itself, once every sync PR is closed and `main`'s build has
-finished. **Don't open or edit website PRs.** If step 0 printed `website-pdf stale`, only check it's
-being handled: open sync PRs or an open `Update résumé PDF` PR both mean it is. If neither exists,
-say so in the notification instead of opening a PR.
+updates) its `Update résumé PDF` PR by itself every time `main`'s build finishes with a PDF the
+website doesn't have yet. **Don't open or edit website PRs.** If step 0 printed `website-pdf stale`,
+only check it's being handled: an open `Update résumé PDF` PR means it is. If none exists, say so in
+the notification instead of opening a PR.
 <!-- /website -->
 
 ### 7. Finish
