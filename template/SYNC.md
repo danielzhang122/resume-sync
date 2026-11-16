@@ -89,6 +89,10 @@ If `last_sha` no longer exists (history rewritten), review the current README an
 - Edit following the rules above. Also re-check existing bullets for the changed projects: if a bullet
   is now wrong or overstated, that fix is a change too. Re-read each result for consistency, tone and
   length.
+- **Rewrite until it fits on one page, before you push.** With only that change applied, run
+  `bash scripts/page_check.sh {{TEX_FILE}}`. If it says more than 1 page, it prints what spilled onto page 2:
+  tighten the text you changed (or archive weaker content per rule 5) and run it again. Repeat until
+  it prints `Pages: 1`. Only then commit and push. (The first run installs LaTeX, about a minute.)
 
 ### 4. Update state (on `main`, never in a PR)
 Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
@@ -114,9 +118,19 @@ with each other.
   `git pull --rebase` before pushing to it (the Action adds commits).
 - The GitHub Action builds the PDF on each PR branch, commits `{{PDF_NAME}}` and
   `resume-preview.webp` back to it, and fails if the PDF is longer than one page. Whenever `main`'s
-  résumé changes, it merges `main` into every open `resume-sync-*` branch and rebuilds it. After
-  pushing, check the Action's run for your branch; if the page overflowed, tighten that PR's own text
-  and push again. Also check the latest build of every open sync PR and fix any that failed.
+  résumé changes, it merges `main` into every open `resume-sync-*` branch and rebuilds it.
+- **After every push, wait for the build with `bash scripts/wait_build.sh <branch>`** (one command;
+  it waits up to 10 minutes). Never use `sleep`: the cloud blocks it, so it returns at once and you
+  would end the run before the build finishes. If it prints `Build FAILED`, the page overflowed in
+  CI: run `bash scripts/page_check.sh {{TEX_FILE}}`, tighten, commit, push, and run `wait_build.sh` again. Keep
+  going until it prints `Build passed`. A failed build means the PDF was never updated, neither on
+  the PR nor, after merge, on `main` or the website.
+- Also check the latest build of every open sync PR and of `main` (GitHub MCP `actions_list`,
+  workflow `build.yml`). If one failed (usually because a merged PR overflowed the page), fix it the
+  same way: on that PR's branch, or for `main` in a new `Résumé sync: fix build on main` PR.
+- Never end the run while a sync PR's build is failing or unfinished. If after three rewrites it
+  still fails, or `wait_build.sh` can't get a result, put "BUILD FAILED: <PR>, PDF not updated"
+  first in the step 7 notification.
 
 <!-- website -->
 ### 6. Website PDF
