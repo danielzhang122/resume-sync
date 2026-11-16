@@ -177,11 +177,12 @@ to `main`, so the state goes through a PR that Daniel merges:
   PRs after opening.
 
 ### 6. Website PDF
-The `Website PDF` GitHub Action opens (or updates) the website's `Update résumé PDF` PR by itself
-every time `main`'s build finishes with a PDF the website doesn't have yet. **Don't open or edit
-website PRs.** If step 0 printed `website-pdf stale`, only check it's being handled: an open
-`Update résumé PDF` PR means it is. If none exists, say so in the notification (e.g. "website PDF
-is stale but no PR was opened; check the Website PDF Action") instead of opening a PR.
+The `Website PDF` GitHub Action opens (or updates) the website's `Update résumé PDF` PR by itself,
+once every sync PR is closed and `main`'s build has finished. **Don't open or edit website PRs.**
+If step 0 printed `website-pdf stale`, only check it's being handled: open sync PRs (the Action is
+waiting for Daniel) or an open `Update résumé PDF` PR both mean it is. If neither exists, say so
+in the notification (e.g. "website PDF is stale but no PR was opened; check the Website PDF
+Action") instead of opening a PR.
 
 ### 7. Finish
 End with a short summary: repos checked, changes proposed, PRs opened or updated, inconsistencies.

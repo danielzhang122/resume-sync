@@ -59,8 +59,8 @@ Then, in their repo:
 5. Check the **Build résumé** Action ran green on GitHub (push a no-op `.tex` change or use
    *Run workflow* if it didn't trigger). In the repo's *Settings → Actions → General*, workflow
    permissions must allow **Read and write** so it can commit the PDF back.
-6. **Website only:** the `Website PDF` Action opens (or updates) the website's PDF PR whenever
-   `main`'s PDF changes, and needs a token for the website repo. Have them create a fine-grained personal access
+6. **Website only:** the `Website PDF` Action opens the website's PDF PR once every sync PR is
+   closed, and needs a token for the website repo. Have them create a fine-grained personal access
    token limited to that repo with **Contents** and **Pull requests** set to *Read and write*, and
    add it to the résumé repo as the Actions secret `WEBSITE_TOKEN`. Without it, that Action fails
    with a message saying exactly this.
