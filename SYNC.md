@@ -40,6 +40,16 @@ exactly. You never merge anything. Daniel reviews and merges every pull request 
 10. **Daniel rewords your drafts.** He rewords drafted bullets in his own voice before merging so the résumé
    doesn't read like AI output. Don't revert his wording to your draft or "polish" it; only edit a
    bullet he reworded if its facts no longer match the repos.
+11. **Jobs and teams, not just projects.** Experience entries (jobs, co-ops, design teams) change
+   too. Sources for them: the site's Experience section (`site experience` lines from step 0) and
+   any repo tied to that job. A repo is tied to a job when it is in `links` in `sync-state.json`, or
+   when its README or description names an employer, client, site or team on the résumé (e.g. a
+   tool built at a co-op, CAD or code for a design team). Put what such a repo shows into that
+   job's entry, not a new project entry, and add the repo to `links` (`"<repo>": "<entry>"`) in
+   the state PR so later runs know.
+12. **Private repos** count like public ones, but never link them on the résumé and never copy
+   client data, part lists or internal names from them. Use what they show you built and the scale
+   (counts, tools); if the site describes the same work, stay consistent with it.
 
 ## Procedure
 
@@ -52,7 +62,7 @@ its branch holds the newest state that Daniel hasn't merged yet: run
 re-review what that run already covered (step 4 then updates that same PR).
 Then, from this repo's folder, run `python3 scripts/check.py`. It reads `sync-state.json`, pulls every
 watched repo (all cloned beside this one), and prints one line per thing to do:
-`changed <repo> <files>`, `new <repo>`, `website-pdf stale`. Files listed in `exclude_paths` are the
+`changed <repo> <files>`, `new <repo>` (`(private)` and `-> <job>` when they apply), `website-pdf stale`, and `site <section> -/+ <text>`. Files listed in `exclude_paths` are the
 pipeline's own outputs (the résumé source and PDF, the state file, the website's copy of the PDF),
 so the pipeline's own commits never count as changes. If the output ends with `NOTHING TO SYNC`, send
 the step 7 notification ("Résumé sync: nothing changed this week."), end the run with "Nothing to
@@ -61,6 +71,11 @@ sync." and **commit nothing**. If it prints
 GitHub MCP tool (`mcp__github__search_repositories`, query
 `user:danielzhang122 fork:false archived:false`) and treat any name not in `repos` or `ignore` as new.
 Continue with only the repos the check listed.
+
+Lines starting `site <section> -` / `site <section> +` are the exact text that changed on the
+website (old / new), section by section. Read every one: a single reworded sentence in Experience
+or Projects is a résumé change even when the same run's other website commits are only styling.
+Never dismiss the website as "cosmetic" without going through these lines.
 
 ### 1. Load state
 - `repos` in `sync-state.json` maps each watched repo to the last commit already reviewed.

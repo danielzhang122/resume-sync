@@ -34,6 +34,16 @@ anything. {{FIRST_NAME}} reviews and merges every pull request (PR).
    README{{OR_SITE_2}} states a new value explicitly.
 10. **{{FIRST_NAME}} rewords your drafts.** Don't revert their wording to your draft or "polish" it;
    only edit a bullet they reworded if its facts no longer match the repos.
+11. **Jobs and teams, not just projects.** Experience entries (jobs, co-ops, design teams) change
+   too. Sources for them: the site's Experience section (`site experience` lines from step 0) and
+   any repo tied to that job. A repo is tied to a job when it is in `links` in `sync-state.json`, or
+   when its README or description names an employer, client, site or team on the résumé (e.g. a
+   tool built at a co-op, CAD or code for a design team). Put what such a repo shows into that
+   job's entry, not a new project entry, and add the repo to `links` (`"<repo>": "<entry>"`) in
+   the state PR so later runs know.
+12. **Private repos** count like public ones, but never link them on the résumé and never copy
+   client data, part lists or internal names from them. Use what they show you built and the scale
+   (counts, tools); if the site describes the same work, stay consistent with it.
 
 ## Procedure
 
@@ -42,13 +52,18 @@ Keep token use low: don't read files you don't need, and stop as soon as there's
 ### 0. Quick check (always first)
 From this repo's folder run `python3 scripts/check.py`. It reads `sync-state.json`, pulls every
 watched repo (all cloned beside this one), and prints one line per thing to do:
-`changed <repo> <files>`, `new <repo>`{{STALE_LINE}}. Files listed in `exclude_paths` are the
+`changed <repo> <files>`, `new <repo>` (`(private)` and `-> <job>` when they apply){{STALE_LINE}}, and `site <section> -/+ <text>`. Files listed in `exclude_paths` are the
 pipeline's own outputs, so its own commits never count as changes. If the output ends with
 `NOTHING TO SYNC`, send the step 7 notification ("Résumé sync: nothing changed this week."), end
 the run with "Nothing to sync." and **commit nothing**. If it prints `repo-list unavailable`, list
 repos with the GitHub MCP tools (or `gh api -X GET search/repositories -f
 q='user:{{GITHUB_USER}} fork:false archived:false'`) and treat any name not in `repos` or `ignore`
 as new. Continue with only the repos the check listed.
+
+Lines starting `site <section> -` / `site <section> +` are the exact text that changed on the
+website (old / new), section by section. Read every one: a single reworded sentence in Experience
+or Projects is a résumé change even when the same run's other website commits are only styling.
+Never dismiss the website as "cosmetic" without going through these lines.
 
 ### 1. Load state
 - `repos` in `sync-state.json` maps each watched repo to the last commit already reviewed.
