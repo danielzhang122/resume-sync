@@ -1,5 +1,6 @@
-# Opens (or updates) the "Update résumé PDF" PR in the website repo, but only once every résumé
-# sync PR is closed and main's build has finished, so it never copies a PDF that's about to change.
+# Opens (or updates) the "Update résumé PDF" PR in the website repo whenever main's PDF differs from
+# the website's, but only once no résumé sync PR is open and main's build has finished, so it never
+# copies a PDF that's about to change.
 # Needs the secret WEBSITE_TOKEN (see INSTALL.md); does nothing when WEBSITE_REPO is empty.
 name: Website PDF
 
@@ -32,8 +33,11 @@ env:
 jobs:
   website-pdf:
     # A merged sync PR is handled by the main build it triggers; a closed one runs right away.
+    # Any finished main build counts, even one marked failed: that run also rebuilds the open sync
+    # branches, and one of them overflowing must not hold back main's PDF. If main's own build
+    # failed, its PDF didn't change, so the copy step finds nothing to do.
     if: >-
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'cancelled') ||
       (github.event_name == 'pull_request_target' && startsWith(github.event.pull_request.head.ref, 'resume-sync-') && !github.event.pull_request.merged) ||
       github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
