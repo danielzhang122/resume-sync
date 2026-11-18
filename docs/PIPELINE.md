@@ -114,5 +114,5 @@ of deliberate tests, not from a long track record.
 ## What changed in practice
 
 Before: edit LaTeX, export the PDF, copy it into the website repo, regenerate the preview image,
-update the "updated" date, push, and remember to cross-check every repo by hand. Now: review a few small pull requests, one per change, each with
-sources, and merge or close each one.
+update the "updated" date, push, and remember to cross-check every repo by hand. Now: review a few
+small pull requests, one per change, each with sources, and merge or close each one.
