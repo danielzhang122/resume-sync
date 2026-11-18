@@ -8,12 +8,11 @@ another. Nothing reaches the résumé or the website until I merge it.
 
 ## Why
 
-My résumé went out of date in a way that mattered: it described a quadruped controller as a
-"custom inverse-kinematics solver with OpenCV obstacle avoidance". The repo said, correctly, that
-it's a joint-space trot gait and that computer vision is future work. A reviewer caught the
-mismatch. The cause was structural: the résumé, the site and the repos were edited separately,
-and nothing checked them against each other. This pipeline makes the repos the source of truth
-and the résumé a reviewed output of them.
+Projects keep moving after a résumé is written: a design gets simplified, a feature is pushed to
+future work, a number changes. When the résumé, the site and the repos are edited separately,
+nothing keeps them in step, and keeping them consistent by hand is easy to put off. This pipeline
+makes the repos the source of truth and the résumé a reviewed output of them: every claim has to
+point to the commit, README or test that backs it.
 
 ## Architecture
 
@@ -101,7 +100,7 @@ All tests ran on 2026-10-31/11-01 against the real repos.
 | Page limit | Pushed a résumé padded to two pages to a test branch | Build failed with "Résumé is 2 pages; it must be 1"; nothing committed |
 | Broken LaTeX | (accidental) a test file with a stray control character | Compile failed; nothing committed |
 | Reproducible PDF | Built `main` twice with no source change | **Failed first**: the timestamp setting never reached LaTeX inside the build container, so the second build committed a different PDF. Fixed in `resume.tex`; the rebuild then logged "Nothing changed." |
-| End-to-end | Planted the old false quadruped claim on a test branch, rewound the state, ran the agent | In 186 s it detected the quadruped README change, replaced the claim with what the repo supports (including the README's measured 0.11 m/s walking speed), removed hardware part numbers nothing in the repo backs up, opened a PR citing commit `3c259d2`, and the build passed at one page. Closed unmerged |
+| End-to-end | Planted a deliberately overstated quadruped bullet (an IK solver and computer vision the repo doesn't have) on a test branch, rewound the state, ran the agent | In 186 s it detected the quadruped README change, replaced the claim with what the repo supports (including the README's measured 0.11 m/s walking speed), removed hardware part numbers nothing in the repo backs up, opened a PR citing commit `3c259d2`, and the build passed at one page. Closed unmerged |
 | No loop | Ran the real weekly job right after | Found only the stale website PDF, opened one website PR, made no résumé or state commits (58 s) |
 
 Bugs the tests caught, all fixed: commits authored as the AI instead of me (since 2026-11-01
@@ -115,6 +114,5 @@ of deliberate tests, not from a long track record.
 ## What changed in practice
 
 Before: edit LaTeX, export the PDF, copy it into the website repo, regenerate the preview image,
-update the "updated" date, push, and remember to cross-check every repo by hand (I didn't, which
-is how the false claim survived). Now: review a few small pull requests, one per change, each with
+update the "updated" date, push, and remember to cross-check every repo by hand. Now: review a few small pull requests, one per change, each with
 sources, and merge or close each one.
