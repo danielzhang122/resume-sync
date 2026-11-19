@@ -51,6 +51,11 @@
       "pr": 11,
       "change": "Add subtitle-sync, archive Pacemaker",
       "closed": "2026-11-07"
+    },
+    {
+      "pr": 25,
+      "change": "Add Raspberry Pi to Skills (Daniel hasn't used one hands-on)",
+      "closed": "2026-11-19"
     }
   ],
   "links": {

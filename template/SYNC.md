@@ -44,6 +44,12 @@ anything. {{FIRST_NAME}} reviews and merges every pull request (PR).
 12. **Private repos** count like public ones, but never link them on the résumé and never copy
    client data, part lists or internal names from them. Use what they show you built and the scale
    (counts, tools); if the site describes the same work, stay consistent with it.
+13. **Skills follow the work.** The Skills section must match the tools, standards and
+   certifications used in the bullets and the repos{{OR_SITE_2}}. When a change adds a tool to a
+   bullet (e.g. KiCad on a project), add it to the matching Skills line in that same change, and
+   propose the same edit when a site's Skills section changes (`site skills` lines). Re-check
+   Skills on every full vet. Each skill needs a source. Keep each Skills line to its current number
+   of lines: replace a weaker or redundant item rather than wrapping a line.
 
 ## Procedure
 
@@ -106,8 +112,8 @@ If `last_sha` no longer exists (history rewritten), review the current README an
   length.
 - **Rewrite until it fits on one page, before you push.** With only that change applied, run
   `bash scripts/page_check.sh {{TEX_FILE}}`. If it says more than 1 page, it prints what spilled onto page 2:
-  tighten the text you changed (or archive weaker content per rule 5) and run it again. Repeat until
-  it prints `Pages: 1`. Only then commit and push. (The first run installs LaTeX, about a minute.)
+  tighten the text you changed (or archive weaker content per rule 5) and run it again. Repeat until it prints `Pages: 1`
+  with no "Only just fits" warning (a page with under 6 pt to spare can overflow in CI). Only then commit and push. (The first run installs LaTeX, about a minute.)
 
 ### 4. Update state (on `main`, never in a PR)
 Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
