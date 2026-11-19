@@ -112,8 +112,8 @@ If `last_sha` no longer exists (history rewritten), review the current README an
   length.
 - **Rewrite until it fits on one page, before you push.** With only that change applied, run
   `bash scripts/page_check.sh {{TEX_FILE}}`. If it says more than 1 page, it prints what spilled onto page 2:
-  tighten the text you changed (or archive weaker content per rule 5) and run it again. Repeat until
-  it prints `Pages: 1`. Only then commit and push. (The first run installs LaTeX, about a minute.)
+  tighten the text you changed (or archive weaker content per rule 5) and run it again. Repeat until it prints `Pages: 1`
+  with no "Nearly full last lines" warning (those lines may wrap in CI's LaTeX and overflow). Only then commit and push. (The first run installs LaTeX, about a minute.)
 
 ### 4. Update state (on `main`, never in a PR)
 Set each reviewed repo's SHA in `sync-state.json` to the commit you reviewed up to, add any new repos
