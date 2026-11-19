@@ -44,6 +44,12 @@ anything. {{FIRST_NAME}} reviews and merges every pull request (PR).
 12. **Private repos** count like public ones, but never link them on the résumé and never copy
    client data, part lists or internal names from them. Use what they show you built and the scale
    (counts, tools); if the site describes the same work, stay consistent with it.
+13. **Skills follow the work.** The Skills section must match the tools, standards and
+   certifications used in the bullets and the repos{{OR_SITE_2}}. When a change adds a tool to a
+   bullet (e.g. KiCad on a project), add it to the matching Skills line in that same change, and
+   propose the same edit when a site's Skills section changes (`site skills` lines). Re-check
+   Skills on every full vet. Each skill needs a source. Keep each Skills line to its current number
+   of lines: replace a weaker or redundant item rather than wrapping a line.
 
 ## Procedure
 
