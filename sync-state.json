@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-11-16",
+  "last_run": "2026-11-23",
   "config": {
     "github_user": "danielzhang122",
     "resume_repo": "resume-sync",
@@ -7,23 +7,23 @@
     "website_repo": "website"
   },
   "repos": {
-    "resume-sync": "d25a0bc8557a4198b3d8d43ad6253a854799e21a",
-    "website": "73b01c7b9998fc2843b850ce7563766d35a71a88",
+    "resume-sync": "fb9416ce5805a9f83de1463c06ac2edeeb7850f9",
+    "website": "ab5d0f2b92a4a815a5f7c20df47093de5f0f763a",
     "ontario-nuclear-dashboard": "6aee3f7b60d822bac3acc24d0e2a406c0cd22d04",
     "quadruped-robot": "af4a5f259ecca8668ab7dbd04815cf695929e462",
     "globe-ghost": "537c79ffc86982e1ec669ebb5ff1941b41486544",
     "sfwreng-3k04-pacemaker": "b296d71f5a5b06064ab96aa453a935a529d9bd78",
     "wage-tracker": "3e4d3f71c4ff8c72fb4438ef5a94b44e034c45d7",
-    "ChatGeePeeTee": "4cf656f6f842c41b170103594870ac783ecdf355",
+    "ChatGeePeeTee": "48c76284b5dd38dba51f11642da158229b295d49",
     "junk-drawer": "cc9928c478eafb97193a6c269c466fa07d78c87b",
     "danielzhang122": "f6aab267ffdebd1fc8be96e18033826494fb5570",
     "subtitle-sync": "6de65c0f1d499db847f176a3a84e0470be87f369",
     "subtitle-sync-server": "702255fe67240bd945e2fca7f8a91e5a0950af1c",
-    "daniel-lm": "b5d31664e8e1a5baf77385334bd8d9d2debcbd73",
+    "daniel-lm": "656dbafa3acd6ad9ad8281852aa35c480fd0c583",
     "pdf-liberator": "13adc374bb9deafc912c8b366bee6df860191dd0",
     "candu-anatomy": "6d6b75838f589688d0cd58ade8df275c16c29f9c",
     "radioisotope-workshop": "2441909dd29ec905e7378ffeebfcfee1fe59b3df",
-    "sbwrs-label-tracker": "798f81dac06b226416ee080f91e08219c7cb9349",
+    "sbwrs-label-tracker": "2055a0aa03dcfb9e8503f31833f32e0745d94885",
     "notes": "584956b4c6b597479e7c24dc174e64e0a3a73949"
   },
   "exclude_paths": {
